@@ -18,7 +18,7 @@ def storeInDict(text, dict):
         
         key = words[0]
         value = words[1]
-        dict[key] = int(value)
+        dict[key] = value
 
 file = tkFileDialog.askopenfile(title="Open input data file",
                                 mode='r',
@@ -35,7 +35,17 @@ for x in range(0, 992, 8):
 text = file.read()
 reg = extract(text, 'REGISTERS', 'MEMORY')
 mem = extract(text, 'MEMORY', 'CODE')
+code = extract(text, 'CODE', 'EOF')
 
+op = []
+for element in code:
+    line = element.strip()
+    word = line.split('\r')
+    op.append(word)
+    
+
+print op
+    
 storeInDict(reg, regs)
 storeInDict(mem, memory)
     
