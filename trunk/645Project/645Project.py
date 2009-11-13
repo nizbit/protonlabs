@@ -13,10 +13,10 @@ def extract(text, sub1, sub2):
 def storeInDict(text, dict):
     for line in text:
         line = line.strip()
-        words = line.split()
+        words = line.split('  ')
         key = words[0]
         value = words[1]
-        dict[key] = value
+        dict[key] = int(value)
 
 file = tkFileDialog.askopenfile(title="Open input data file",
                                 mode='r',
@@ -34,8 +34,6 @@ text = file.read()
 reg = extract(text, 'REGISTERS', 'MEMORY')
 mem = extract(text, 'MEMORY', 'CODE')
 code = extract(text, 'CODE', 'EOF')
-
-print reg
   
 storeInDict(reg, regs)
 storeInDict(mem, memory)
@@ -49,17 +47,26 @@ for element in code:
 
 
 for item in op:
-    for element in item:
-        if element == 'Loop:':
+    for i in item:
+        if i == 'Loop:':
             continue
         else:
-            if element == 'LD':
-                storeReg = item[2]
-                readReg = item[3]
-                result = readReg.translate(None, ')').split('(')
-                #answer = int(result[0]) + regs[result[1]]
-                #print answer  
-    
+            if i == 'LD':
+                dest = item[2]
+                source = item[3]
+                result = source.translate(None, ')').split('(')
+                answer = int(result[0]) + regs[result[1]]
+                regs[dest] = answer
+
+        if i == 'DADD':
+            print item
+            dest = regs[item[1]]
+            source1 = regs[item[2]]
+            source2 = regs[item[3]]
+            a = source1 + source2
+            regs[dest] = answer  
+
+print regs    
 file.close()
 
 """
