@@ -45,7 +45,7 @@ for element in code:
     word = newline.split()
     op.append(word)
 
-
+"""
 for item in op:
     for i in item:
         if i == 'Loop:':
@@ -65,7 +65,7 @@ for item in op:
             source2 = regs[item[3]]
             a = source1 + source2
             regs[dest] = answer  
-
+"""
 print regs    
 file.close()
 
