@@ -45,7 +45,7 @@ for element in code:
     word = newline.split()
     op.append(word)
 
-"""
+
 for item in op:
     for i in item:
         if i == 'Loop:':
@@ -59,13 +59,27 @@ for item in op:
                 regs[dest] = answer
 
         if i == 'DADD':
-            print item
-            dest = regs[item[1]]
+            dest = item[1]
             source1 = regs[item[2]]
             source2 = regs[item[3]]
-            a = source1 + source2
-            regs[dest] = answer  
-"""
+            answer = source1 + source2
+            regs[dest] = answer
+            
+        if i == 'DADDI':
+            dest = item[1]
+            source1 = regs[item[2]]
+            source2 = item[3]
+            source2 = source2.translate(None, '#')
+            answer = source1 + int(source2)
+            regs[dest] = answer
+            
+        if i == 'SD':
+            temp = item[1]
+            addr = temp.translate(None, ')').split('(')
+            dest = int(addr[0]) + regs[addr[1]]
+            source = regs[item[2]]
+            regs[dest] = source   
+
 print regs    
 file.close()
 
