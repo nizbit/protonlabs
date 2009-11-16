@@ -1,3 +1,10 @@
+REGISTERS
+R1  16
+R3  42
+MEMORY 
+16  60
+8   40
+CODE
 Loop: LD, R2, 0(R1)
       Loop: LD, R2, 0(R1)
             Loop: LD, R2, 0(R1)
