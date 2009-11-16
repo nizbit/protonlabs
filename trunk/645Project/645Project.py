@@ -135,6 +135,7 @@ def process(op, memory, regs, loopCount):
                         go = True
                         #loopCount += 1   
     return loopCount
+
 file = tkFileDialog.askopenfile(title="Open input data file",
                                 mode='r',
                                 filetypes=[("all formats", "*")])
