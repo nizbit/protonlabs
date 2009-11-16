@@ -21,6 +21,89 @@ def storeInDict(text, dict):
         temp.append(words)
     return temp
 
+def process(op, memory, regs, loopCount):
+    go = True
+    loop = 0
+    while go == True:
+        for item in op:
+            for i in item:
+                if i == 'Loop:':
+                    continue
+                """
+                Need to add checking if R0 is trying to be written(stored) to
+                """
+                if i == 'LD':
+                    if item[0] == "Loop:":
+                        dest = item[2]
+                        source = item[3]
+                    else:
+                        dest = item[1]
+                        source = item[2]
+                    result = source.translate(None, ')').split('(')
+                    loc = int(result[0]) + regs[result[1]]
+                    memValue = memory[str(loc)]
+                    #memValue = memory[str(0)]
+                    regs[dest] = memValue    
+        
+                if i == 'DADD':
+                    if item[0] == "Loop:":
+                        dest = item[2]
+                        source1 = regs[item[3]]
+                        source2 = regs[item[4]]
+                    else:
+                        dest = item[1]
+                        source1 = regs[item[2]]
+                        source2 = regs[item[3]]
+                    #print source1, source2
+                    answer = source1 + source2
+                    #print answer
+                    regs[dest] = answer
+                    
+                if i == 'DADDI':
+                    if item[0] == "Loop:":
+                        dest = item[2]
+                        source1 = regs[item[3]]
+                        source2 = item[4]
+                    else:
+                        dest = item[1]
+                        source1 = regs[item[2]]
+                        source2 = item[3]
+#                    dest = item[1]
+#                    source1 = regs[item[2]]
+#                    source2 = item[3]
+                    source2 = source2.translate(None, '#')
+                    answer = source1 + int(source2)
+                    #print answer
+                    regs[dest] = answer
+                    
+                if i == 'SD':
+                    if item[0] == "Loop:":
+                        temp = item[2]
+                        addr = temp.translate(None, ')').split('(')
+                        dest = int(addr[0]) + regs[addr[1]]
+                        source = regs[item[3]]
+                        memory[dest] = source
+                    
+                    else:
+                        temp = item[1]
+                        addr = temp.translate(None, ')').split('(')
+                        dest = int(addr[0]) + regs[addr[1]]
+                        source = regs[item[2]]
+                        memory[dest] = source
+                    
+                if i == "BNEZ":
+                    loop += 1
+                    loopCount.append(loop)
+                    cmp = regs[item[1]]
+                    #print cmp
+                    if cmp <= 0:
+                        go = False
+                        #loopCount += 1
+                        #break
+                    else:
+                        go = True
+                        #loopCount += 1   
+
 file = tkFileDialog.askopenfile(title="Open input data file",
                                 mode='r',
                                 filetypes=[("all formats", "*")])
@@ -48,40 +131,72 @@ for element in code:
     word = newline.split()
     op.append(word)
 
-numSpaceOp = []
+indent = []
 for item in code:
     temp = len(item) - len(item.lstrip())
-    numSpaceOp.append(temp)
+    indent.append(temp)
 
-tempstack = []
-orderedop = []
+parse = []
+for x in range(len(indent)-1):
+    if indent[x] < indent[x+1]:
+        parse.append(x)
+    if indent[x] > indent[x+1]:
+        parse.append(x)
+parse.append(len(indent)-1)
 
-x = 0
-while x < len(numSpaceOp)-1:
-    if numSpaceOp[x] < numSpaceOp[x+1]:
-        tempstack.append(op[x])
+numLoops = len(parse)/2
+print numLoops
 
-    if  numSpaceOp[x] < numSpaceOp[x+1] and numSpaceOp[x+2] == numSpaceOp[x+3]:
-        orderedop.append(op[x+1])
-        orderedop.append(op[x+2])
-        orderedop.append(op[x+3])
-        x+=4
-        break
-    x+=1
-                    
-#for x in range(len(numSpaceOp)-1):
-#    print x
-#    if numSpaceOp[x] < numSpaceOp[x+1]:
-#        tempstack.append(op[x])
-#        orderedop.append(op[x+1])
-#    elif numSpaceOp[x] > numSpaceOp[x+1]:
-#        pass
-#    elif numSpaceOp[x] == numSpaceOp[x+1]:
-#        orderedop.append(op[x+1])
-    #if numSpaceOp[x+1] == numSpaceOp[x]:
-     #   orderedop.append(op[x+1])
+loop = []
+for x in range(len(op)):
+if  
+        
     
-print tempstack
-print orderedop
+    
+print parse 
 
 file.close()
+
+"""
+    tempstack = []
+    orderedop = []
+    print numSpaceOp
+    x = 0
+    while x < len(numSpaceOp)-1:
+        #print x
+        if numSpaceOp[x] < numSpaceOp[x+1]:
+            print '1'
+            tempstack.append(op[x])
+            x+=1
+    
+        if numSpaceOp[x] < numSpaceOp[x+1] and numSpaceOp[x+1] == numSpaceOp[x+2]:
+            print '4'
+            orderedop.append(op[x])
+            orderedop.append(op[x+1])
+            orderedop.append(op[x+2])
+            x+=3
+        if numSpaceOp[x] > numSpaceOp[x+1] and numSpaceOp[x+1] == numSpaceOp[x+2]:
+            print '4'
+            orderedop.append(op[x])
+            tempstack.append(op[x+1])
+            tempstack.append(op[x+2])
+            x+=3
+        if numSpaceOp[x] == numSpaceOp[x+1]:
+            
+        
+    #print x              
+    #for x in range(len(numSpaceOp)-1):
+    #    print x
+    #    if numSpaceOp[x] < numSpaceOp[x+1]:
+    #        tempstack.append(op[x])
+    #        orderedop.append(op[x+1])
+    #    elif numSpaceOp[x] > numSpaceOp[x+1]:
+    #        pass
+    #    elif numSpaceOp[x] == numSpaceOp[x+1]:
+    #        orderedop.append(op[x+1])
+        #if numSpaceOp[x+1] == numSpaceOp[x]:
+         #   orderedop.append(op[x+1])
+        
+    #print tempstack
+    #print orderedop
+"""
