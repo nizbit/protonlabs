@@ -130,12 +130,16 @@ for element in code:
     newline = line.translate(None, ',')
     word = newline.split()
     op.append(word)
-
+"""
+    Finding the indents
+"""
 indent = []
 for item in code:
     temp = len(item) - len(item.lstrip())
     indent.append(temp)
-
+"""
+    Finding code blocks based on indents
+"""
 parse = []
 for x in range(len(indent)-1):
     if indent[x] < indent[x+1]:
@@ -143,16 +147,30 @@ for x in range(len(indent)-1):
     if indent[x] > indent[x+1]:
         parse.append(x)
 parse.append(len(indent)-1)
-
+"""
+    Making position of code blocks match
+"""
 numLoops = len(parse)/2
-print numLoops
-
+temp = parse[:numLoops]
+temp2 = parse[numLoops:]
+temp.reverse()
 loop = []
-for x in range(len(op)):
-if  
-        
+for x in range(len(parse)/2):
+    loop.append(temp[x])
+    loop.append(temp2[x])
+
+x = 0
+loop = []
+while x < numLoops:
     
-    
+    for y in range(temp[x], temp2[x]+1):
+        loop.append(op[y])
+    x += 1
+print temp
+print temp2
+print x
+print numLoops
+print loop
 print parse 
 
 file.close()
