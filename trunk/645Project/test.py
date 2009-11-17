@@ -146,7 +146,7 @@ for x in range(len(indent)-1):
         parse.append(x)
     if indent[x] > indent[x+1]:
         parse.append(x)
-parse.append(len(indent)-1)
+#parse.append(len(indent)-1)
 """
     Making position of code blocks match
 """
@@ -162,7 +162,8 @@ for x in range(len(parse)/2):
 x = 0
 loop = []
 while x < numLoops:
-    
+    #if x == 0:
+        
     for y in range(temp[x], temp2[x]+1):
         loop.append(op[y])
     x += 1
