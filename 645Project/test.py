@@ -93,7 +93,6 @@ def process(op, memory, regs, loopCount):
                     
                 if i == "BNEZ":
                     loop += 1
-                    loopCount.append(loop)
                     cmp = regs[item[1]]
                     #print cmp
                     if cmp <= 0:
@@ -131,14 +130,8 @@ for element in code:
     word = newline.split()
     op.append(word)
 
-place = []
-LooP = "LOOp:"
-for item in op:
-    for x in range(len(item)):
-        if item[x].lower() == LooP.lower():
-            print 'Hi!'
-
-
+process(op,memory,regs,0)
+print regs
 
 
 file.close()
