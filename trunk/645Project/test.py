@@ -1,4 +1,5 @@
 import tkFileDialog
+import itertools
 
 def extract(text, sub1, sub2):
     """
@@ -23,7 +24,8 @@ def storeInDict(text, dict):
 
 def process(op, memory, regs, loopCount):
     go = True
-    loop = 0
+    loopCount = 0
+    loop = 'loop:'
     while go == True:
         for item in op:
             for i in item:
@@ -33,7 +35,7 @@ def process(op, memory, regs, loopCount):
                 Need to add checking if R0 is trying to be written(stored) to
                 """
                 if i == 'LD':
-                    if item[0] == "Loop:":
+                    if item[0].lower() == loop:
                         dest = item[2]
                         source = item[3]
                     else:
@@ -46,7 +48,7 @@ def process(op, memory, regs, loopCount):
                     regs[dest] = memValue    
         
                 if i == 'DADD':
-                    if item[0] == "Loop:":
+                    if item[0].lower() == loop:
                         dest = item[2]
                         source1 = regs[item[3]]
                         source2 = regs[item[4]]
@@ -60,7 +62,7 @@ def process(op, memory, regs, loopCount):
                     regs[dest] = answer
                     
                 if i == 'DADDI':
-                    if item[0] == "Loop:":
+                    if item[0].lower() == loop:
                         dest = item[2]
                         source1 = regs[item[3]]
                         source2 = item[4]
@@ -77,7 +79,7 @@ def process(op, memory, regs, loopCount):
                     regs[dest] = answer
                     
                 if i == 'SD':
-                    if item[0] == "Loop:":
+                    if item[0].lower() == loop:
                         temp = item[2]
                         addr = temp.translate(None, ')').split('(')
                         dest = int(addr[0]) + regs[addr[1]]
@@ -92,7 +94,7 @@ def process(op, memory, regs, loopCount):
                         memory[dest] = source
                     
                 if i == "BNEZ":
-                    loop += 1
+                    loopCount += 1
                     cmp = regs[item[1]]
                     #print cmp
                     if cmp <= 0:
@@ -102,7 +104,8 @@ def process(op, memory, regs, loopCount):
                     else:
                         go = True
                         #loopCount += 1   
-
+    return loopCount
+        
 file = tkFileDialog.askopenfile(title="Open input data file",
                                 mode='r',
                                 filetypes=[("all formats", "*")])
@@ -130,8 +133,10 @@ for element in code:
     word = newline.split()
     op.append(word)
 
-process(op,memory,regs,0)
+temp = process(op, memory, regs, 0)
+print temp
 print regs
+
 
 
 file.close()
