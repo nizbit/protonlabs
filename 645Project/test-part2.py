@@ -145,6 +145,7 @@ def unroll(op, memory, regs):
                 if index > (len(op)):
                     break
                 IO.append(op[index-1])
+                numLoop += 1
                 temp = BNEZ(item, memory, regs)
                 if temp == False:
                     """
@@ -159,7 +160,7 @@ def unroll(op, memory, regs):
                     index = pc
             
             index += 1
-    return IO
+    return (numLoop, IO)
       
 file = tkFileDialog.askopenfile(title="Open input data file",
                                 mode='r',
@@ -189,7 +190,9 @@ for element in code:
     op.append(word)
 
 unroll = unroll(op, memory, regs)
-print unroll
+numLoop = unroll[0]
+IO = unroll[1]
+print IO
 
 file.close()
 """
