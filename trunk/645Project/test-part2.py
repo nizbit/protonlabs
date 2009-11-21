@@ -161,6 +161,38 @@ def unroll(op, memory, regs):
             
             index += 1
     return (numLoop, IO)
+
+def checkDepend(loopCount, op, instructions):
+    temp = []
+    check = ['0', '0']
+    while loopCount != 0:
+        for item in op:
+            if item[0] == "Loop:":
+                temp = item[1:]
+                length = len(item) - 1
+            else:
+                temp = list(item)
+                length = len(item)
+        
+            if check[1] == item[length-2] or check[1] == item[length - 1]:
+                if item[0] == 'BNEZ':
+                    currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                    instructions.append(currenti)
+                    if loopCount != 1:
+                        currenti = ['IF1', 's', 's', 's', 's', 's', 's', 's', 's', 's']
+                        instructions.append(currenti)
+                else:
+                    currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                    instructions.append(currenti)
+        #    elif item[0] == 'BNEZ':
+        #         currenti = ['IF1', 's', 's', 's', 's', 's', 's', 's', 's', 's']
+        #         instructions.append(currenti)
+            else:
+                currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+    
+            check = temp[:]
+        loopCount -= 1
       
 file = tkFileDialog.askopenfile(title="Open input data file",
                                 mode='r',
@@ -192,7 +224,10 @@ for element in code:
 unroll = unroll(op, memory, regs)
 numLoop = unroll[0]
 IO = unroll[1]
-print IO
+
+depend = []
+checkDepend(numLoop, IO, depend)
+print depend
 
 file.close()
 """
