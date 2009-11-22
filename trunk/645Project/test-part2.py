@@ -216,10 +216,7 @@ def checkDepend(ops, instructions):
                 instructions.append(currenti)    
 
         x += 1
-                
-            
-             
-      
+
 file = tkFileDialog.askopenfile(title="Open input data file",
                                 mode='r',
                                 filetypes=[("all formats", "*")])
@@ -257,17 +254,20 @@ IO = unroll[1]
 depend = []
 checkDepend(IO, depend)
 
-prev = depend[0]
-
+#prev = depend[0]
 #for item in depend:
-    
+"""
+top = []
+  
+for x in range(1, len(op)):
+    top.append('I#'+str(x))
+top = top*numLoop
+print top
+"""
 for x in range(1, len(depend)):
-    print 'I#',x
+    print "%10s" % ('I#'+str(x)),
 
-#i = 1
-#while i < 650:
-#    print "%6s %6s %6s" % (thelist[i], thelist[i+1], thelist[i+2])
-#    i = i + 3
+
 
 
 file.close()
