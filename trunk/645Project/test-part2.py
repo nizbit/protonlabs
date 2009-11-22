@@ -249,10 +249,85 @@ def taken(ops, instructions, numloop):
             numloop -= 1
 
         if numloop == 0 and ops[x][0] == 'BNEZ':
-             currenti = ['IF1', 'IF2', 's', 's', 's', 's']
+            currenti = ['IF1', 'IF2', 's', 's', 's', 's']
+            instructions.append(currenti)
+            currenti = ['IF1', 'IF2']
+            instructions.append(currenti)
+
+        x += 1
+
+def nottaken(ops, instructions, numloop, len_op):
+    loop = 'loop:'
+    x = 1
+    
+    for item in ops:
+        for element in item:
+            if element.lower() == loop:
+                del item[0]
+    #print 'ops', ops
+    while(x < len(ops)):
+        #print 'ops', ops[x]
+        
+        if x-1 == 0:
+            #print 'ops', ops[x]
+            currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+            instructions.append(currenti)
+            
+        #print 'x', x
+        if ops[x][0] != 'BNEZ':
+            #print 'ops', ops[x]
+            currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+            instructions.append(currenti)
+        
+        if ops[x][0] == 'BNEZ' and numloop != 0:
+            #print 'ops', ops[x]
+            print x
+            print len_op - x
+            if len_op - (x+1) == 3:
+                currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+                currenti = ['IF1', 'IF2', 'ID', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['IF1', 'IF2', 's', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['IF1', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+            if len_op - (x+1) == 2:
+                currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+                currenti = ['IF1', 'IF2', 'ID', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['IF1', 'IF2', 's', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['s', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+            if len_op - (x+1) == 1:
+                currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+                currenti = ['IF1', 'IF2', 'ID', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['s', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['s', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+            if len_op - (x+1) == 0:
+                currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+                currenti = ['s', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['s', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['s', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+            
+            numloop -= 1
+
+        if numloop == 0 and ops[x][0] == 'BNEZ':
+             currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
              instructions.append(currenti)
-             currenti = ['IF1', 'IF2']
-             instructions.append(currenti)
+             #currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+             #instructions.append(currenti)
+
 
         x += 1
 
@@ -295,6 +370,11 @@ flush(IO, depend)
 
 depend = []
 taken(IO, depend, numLoop)
+
+
+depend = []
+len_op = len(op)
+nottaken(IO, depend, numLoop, len_op)
 print depend
 """
 for x in range(1, len(depend)):
