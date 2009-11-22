@@ -162,37 +162,63 @@ def unroll(op, memory, regs):
             index += 1
     return (numLoop, IO)
 
-def checkDepend(loopCount, op, instructions):
-    temp = []
-    check = ['0', '0']
-    while loopCount != 0:
-        for item in op:
-            if item[0] == "Loop:":
-                temp = item[1:]
-                length = len(item) - 1
-            else:
-                temp = list(item)
-                length = len(item)
+def checkDepend(ops, instructions):
+    loop = 'loop:'
+    x = 1
+    
+    for item in ops:
+        for element in item:
+            if element.lower() == loop:
+                del item[0]
+    print 'ops', ops
+    while(x < len(ops)):
+        #print 'ops', ops[x]
         
-            if check[1] == item[length-2] or check[1] == item[length - 1]:
-                if item[0] == 'BNEZ':
-                    currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
-                    instructions.append(currenti)
-                    if loopCount != 1:
-                        currenti = ['IF1', 's', 's', 's', 's', 's', 's', 's', 's', 's']
-                        instructions.append(currenti)
-                else:
-                    currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
-                    instructions.append(currenti)
-        #    elif item[0] == 'BNEZ':
-        #         currenti = ['IF1', 's', 's', 's', 's', 's', 's', 's', 's', 's']
-        #         instructions.append(currenti)
-            else:
+        if x-1 == 0:
+            print 'ops', ops[x]
+            currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+            instructions.append(currenti)
+            
+        print 'x', x
+        
+        if len(ops[x]) == 3:
+            if ops[x][0] == 'SD' and ops[x][2] == ops[x-1][1]:
+                print 'ops', ops[x]
+                currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+            if ops[x][0] == 'BNEZ' and ops[x][1] == ops[x-1][1]:
+                print 'ops', ops[x]
+                currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+                currenti = ['IF1', 's', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+            if ops[x][0] == 'BNEZ' and ops[x][1] != ops[x-1][1]:
+                print 'ops', ops[x]
                 currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
                 instructions.append(currenti)
-    
-            check = temp[:]
-        loopCount -= 1
+                currenti = ['IF1', 's', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+            if ops[x][0] != 'BNEZ' and ops[x][2] != ops[x-1][1]:
+                print 'ops', ops[x]
+                currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+                
+        if len(ops[x]) == 4:
+            #if ops[x][0].lower() == loop:
+                
+            if ops[x][2] == ops[x-1][1] or ops[x][3] == ops[x-1][1]:
+                print 'ops', ops[x]
+                currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+            else:
+                print 'ops', ops[x]
+                currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)    
+
+        x += 1
+                
+            
+             
       
 file = tkFileDialog.askopenfile(title="Open input data file",
                                 mode='r',
@@ -226,8 +252,14 @@ numLoop = unroll[0]
 IO = unroll[1]
 
 depend = []
-checkDepend(numLoop, IO, depend)
+checkDepend(IO, depend)
 print depend
+
+depend2 = [] 
+IO2 = [['LD', 'R11', '0(R1)'], ['DADDI', 'R11', 'R11', '#42'], ['SD', '-8(R1)', 'R11]'], ['LD', 'R12', '0(R2)'], ['DADDI', 'R12', 'R12', '#24'], ['SD', '-8(R2)', 'R12'], ['DADD', 'R13', 'R11', 'R12'], ['SD', '-8(R3)', 'R13']]
+checkDepend(IO2, depend2)
+print 'depend2'
+print depend2
 
 file.close()
 """
