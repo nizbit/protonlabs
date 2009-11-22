@@ -162,7 +162,7 @@ def unroll(op, memory, regs):
             index += 1
     return (numLoop, IO)
 
-def checkDepend(ops, instructions):
+def flush(ops, instructions):
     loop = 'loop:'
     x = 1
     
@@ -217,6 +217,45 @@ def checkDepend(ops, instructions):
 
         x += 1
 
+def taken(ops, instructions, numloop):
+    loop = 'loop:'
+    x = 1
+    
+    for item in ops:
+        for element in item:
+            if element.lower() == loop:
+                del item[0]
+    #print 'ops', ops
+    while(x < len(ops)):
+        #print 'ops', ops[x]
+        
+        if x-1 == 0:
+            #print 'ops', ops[x]
+            currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+            instructions.append(currenti)
+            
+        #print 'x', x
+        if ops[x][0] != 'BNEZ':
+            #print 'ops', ops[x]
+            currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+            instructions.append(currenti)
+        
+        if ops[x][0] == 'BNEZ' and numloop != 0:
+            #print 'ops', ops[x]
+            currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+            instructions.append(currenti)
+            currenti = ['IF1', 's', 's', 's', 's', 's', 's']
+            instructions.append(currenti)
+            numloop -= 1
+
+        if numloop == 0 and ops[x][0] == 'BNEZ':
+             currenti = ['IF1', 'IF2', 's', 's', 's', 's']
+             instructions.append(currenti)
+             currenti = ['IF1', 'IF2']
+             instructions.append(currenti)
+
+        x += 1
+
 file = tkFileDialog.askopenfile(title="Open input data file",
                                 mode='r',
                                 filetypes=[("all formats", "*")])
@@ -252,8 +291,23 @@ numLoop = unroll[0]
 IO = unroll[1]
 
 depend = []
-checkDepend(IO, depend)
+flush(IO, depend)
 
+depend = []
+taken(IO, depend, numLoop)
+print depend
+"""
+for x in range(1, len(depend)):
+    print "%10s" % ('c#'+str(x)),
+print '\n'
+
+for item in depend:
+    for element in item:
+        print "%10s" % (element),
+    print
+"""
+
+file.close()
 #prev = depend[0]
 #for item in depend:
 """
@@ -264,13 +318,6 @@ for x in range(1, len(op)):
 top = top*numLoop
 print top
 """
-for x in range(1, len(depend)):
-    print "%10s" % ('I#'+str(x)),
-
-
-
-
-file.close()
 """
 x=0
 while x < 3:
