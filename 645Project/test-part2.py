@@ -170,36 +170,36 @@ def checkDepend(ops, instructions):
         for element in item:
             if element.lower() == loop:
                 del item[0]
-    print 'ops', ops
+    #print 'ops', ops
     while(x < len(ops)):
         #print 'ops', ops[x]
         
         if x-1 == 0:
-            print 'ops', ops[x]
+            #print 'ops', ops[x]
             currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
             instructions.append(currenti)
             
-        print 'x', x
+        #print 'x', x
         
         if len(ops[x]) == 3:
             if ops[x][0] == 'SD' and ops[x][2] == ops[x-1][1]:
-                print 'ops', ops[x]
+                #print 'ops', ops[x]
                 currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
                 instructions.append(currenti)
             if ops[x][0] == 'BNEZ' and ops[x][1] == ops[x-1][1]:
-                print 'ops', ops[x]
+                #print 'ops', ops[x]
                 currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
                 instructions.append(currenti)
                 currenti = ['IF1', 's', 's', 's', 's', 's', 's']
                 instructions.append(currenti)
             if ops[x][0] == 'BNEZ' and ops[x][1] != ops[x-1][1]:
-                print 'ops', ops[x]
+                #print 'ops', ops[x]
                 currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
                 instructions.append(currenti)
                 currenti = ['IF1', 's', 's', 's', 's', 's', 's']
                 instructions.append(currenti)
             if ops[x][0] != 'BNEZ' and ops[x][2] != ops[x-1][1]:
-                print 'ops', ops[x]
+                #print 'ops', ops[x]
                 currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
                 instructions.append(currenti)
                 
@@ -207,11 +207,11 @@ def checkDepend(ops, instructions):
             #if ops[x][0].lower() == loop:
                 
             if ops[x][2] == ops[x-1][1] or ops[x][3] == ops[x-1][1]:
-                print 'ops', ops[x]
+                #print 'ops', ops[x]
                 currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
                 instructions.append(currenti)
             else:
-                print 'ops', ops[x]
+                #print 'ops', ops[x]
                 currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
                 instructions.append(currenti)    
 
@@ -223,6 +223,9 @@ def checkDepend(ops, instructions):
 file = tkFileDialog.askopenfile(title="Open input data file",
                                 mode='r',
                                 filetypes=[("all formats", "*")])
+"""
+    need to ask for type of  trace-flush, predict, not predict
+"""
 regs = {}
 for x in range(32):
     key = 'R' + str(x)
@@ -253,13 +256,19 @@ IO = unroll[1]
 
 depend = []
 checkDepend(IO, depend)
-print depend
 
-depend2 = [] 
-IO2 = [['LD', 'R11', '0(R1)'], ['DADDI', 'R11', 'R11', '#42'], ['SD', '-8(R1)', 'R11]'], ['LD', 'R12', '0(R2)'], ['DADDI', 'R12', 'R12', '#24'], ['SD', '-8(R2)', 'R12'], ['DADD', 'R13', 'R11', 'R12'], ['SD', '-8(R3)', 'R13']]
-checkDepend(IO2, depend2)
-print 'depend2'
-print depend2
+prev = depend[0]
+
+#for item in depend:
+    
+for x in range(1, len(depend)):
+    print 'I#',x
+
+#i = 1
+#while i < 650:
+#    print "%6s %6s %6s" % (thelist[i], thelist[i+1], thelist[i+2])
+#    i = i + 3
+
 
 file.close()
 """
