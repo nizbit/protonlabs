@@ -24,7 +24,6 @@ def storeInDict(text, dict):
 def LD(item, memory, regs):
     loop = 'loop:'
     for i in item:
-        print i
         if i == 'LD':
             if item[0].lower() == loop:
                 dest = item[2]
@@ -36,7 +35,10 @@ def LD(item, memory, regs):
             loc = int(result[0]) + regs[result[1]]
             memValue = memory[str(loc)]
             #memValue = memory[str(0)]
-            regs[dest] = memValue    
+            if dest == 'R0':
+                regs[dest] = 0
+            else:
+                regs[dest] = memValue   
 
 def DADD(item, memory, regs):
     loop = 'loop:'
@@ -53,7 +55,10 @@ def DADD(item, memory, regs):
             #print source1, source2
             answer = source1 + source2
             #print answer
-            regs[dest] = answer
+            if dest == 'R0':
+                regs[dest] = 0
+            else:
+                regs[dest] = answer
             
 def DADDI(item, memory, regs):
     loop = 'loop:'
@@ -70,7 +75,10 @@ def DADDI(item, memory, regs):
             source2 = source2.translate(None, '#')
             answer = source1 + int(source2)
             #print answer
-            regs[dest] = answer
+            if dest == 'R0':
+                regs[dest] = 0
+            else:
+                regs[dest] = answer
 
 def SD(item, memory, regs):            
     loop = 'loop:'
@@ -361,33 +369,84 @@ for element in code:
     word = newline.split()
     op.append(word)
 
+
 unroll = unroll(op, memory, regs)
 numLoop = unroll[0]
 IO = unroll[1]
-
+"""
+    Need to ask for user choice on mode
+"""
 depend = []
 flush(IO, depend)
 
+
+"""
 depend = []
 taken(IO, depend, numLoop)
-
 
 depend = []
 len_op = len(op)
 nottaken(IO, depend, numLoop, len_op)
 print depend
 """
-for x in range(1, len(depend)):
-    print "%10s" % ('c#'+str(x)),
-print '\n'
 
+for x in range(1, len(depend)):
+    if x == 1:
+        print "%14s" % ('c#'+str(x)),
+    else:
+        print "%10s" % ('c#'+str(x)),
+print '\n'
+x = 1
+y = len(depend)-1
 for item in depend:
+    if x <= len(op):
+        print 'I#'+str(x),
+    else:
+        if y == 0:
+            x = len(op)
+            print 'I#'+str(x),
+        else:
+            x = 1
+            print 'I#'+str(x),
+    y -= 1
+    x += 1
     for element in item:
         print "%10s" % (element),
     print
-"""
 
+
+"""
+top = []
+for x in range(1, len(op)):
+    top.append('I#'+str(x))
+top = top*numLoop
+new = zip(top, depend)
+print new
+
+spaces = '        '
+print '          '.join(depend[0])
+
+"""        
 file.close()
+"""
+a = 'IF2'
+spaces = ""
+print "     ".join(depend[0])
+## only process through the next to the last sub-list
+## since we print the next sub-list
+for ctr in range(0, len(depend)-1):
+   sub_lst = depend[ctr]
+   w_ctr = 0
+   ##  look at each letter
+   print 'len(sub_lst)', len(sub_lst)
+   print 'w_ctr', w_ctr
+   while (sub_lst[w_ctr] != a) and (w_ctr < len(sub_lst)):
+      spaces += "   "
+      w_ctr += 1
+   ##  prints the second through the last sub-list with spaces
+   ##  from this list prepended
+   print spaces + "     ".join(depend[ctr+1])
+"""
 #prev = depend[0]
 #for item in depend:
 """
