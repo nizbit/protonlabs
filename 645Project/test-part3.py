@@ -1,4 +1,5 @@
 import tkFileDialog
+import tkSimpleDialog
 
 def extract(text, sub1, sub2):
     """
@@ -342,9 +343,7 @@ def nottaken(ops, instructions, numloop, len_op):
 file = tkFileDialog.askopenfile(title="Open input data file",
                                 mode='r',
                                 filetypes=[("all formats", "*")])
-"""
-    need to ask for type of  trace-flush, predict, not predict
-"""
+
 regs = {}
 for x in range(32):
     key = 'R' + str(x)
@@ -373,22 +372,19 @@ for element in code:
 unroll = unroll(op, memory, regs)
 numLoop = unroll[0]
 IO = unroll[1]
-"""
-    Need to ask for user choice on mode
-"""
-depend = []
-flush(IO, depend)
 
-
-"""
-depend = []
-taken(IO, depend, numLoop)
+mode = tkSimpleDialog.askinteger(' Choose a mode ',\
+    'Please choose a mode:''\n''1 - Flushing''\n''2 - Predict taken''\n''3 - Predict not taken''\n'\
+    ,minvalue=1, maxvalue=3)
 
 depend = []
-len_op = len(op)
-nottaken(IO, depend, numLoop, len_op)
-print depend
-"""
+if mode == 1:
+    flush(IO, depend)
+if mode == 2:
+    taken(IO, depend, numLoop)
+if mode == 3:
+    len_op = len(op)
+    nottaken(IO, depend, numLoop, len_op)
 
 for x in range(1, len(depend)):
     if x == 1:
@@ -420,9 +416,6 @@ for item in depend:
         else:
             print "%14s" % (element),
     print
-
-
-
 """
 top = []
 for x in range(1, len(op)):
