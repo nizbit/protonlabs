@@ -386,12 +386,41 @@ if mode == 3:
     len_op = len(op)
     nottaken(IO, depend, numLoop, len_op)
 
+
+"""
+x = 1
+while(x < len(depend)):
+    if depend[x-1][2] == 's':
+        depend[x].insert(0, '          '*4)
+    if depend[x-1][2] == 'IF2':
+        depend[x].insert(0, '          ')
+
+    x += 1
+"""       
+
+
 for x in range(1, len(depend)):
-    if x == 1:
-        print "%14s" % ('c#'+str(x)),
-    else:
-        print "%10s" % ('c#'+str(x)),
-print '\n'
+    print "%11s" % ('c#'+str(x)),
+print
+
+a = 'IF2'
+spaces = ""
+print "".join(depend[0])
+## only process through the next to the last sub-list
+## since we print the next sub-list
+for ctr in range(0, len(depend)-1):
+   sub_lst = depend[ctr]
+   w_ctr = 0
+   ##  look at each letter
+   while (sub_lst[w_ctr] != a) and (w_ctr < len(sub_lst)):
+      spaces += "   "
+      w_ctr += 1
+   ##  prints the second through the last sub-list with spaces
+   ##  from this list prepended
+   print spaces + "     ".join(depend[ctr+1])
+
+
+"""
 x = 1
 y = len(depend)-1
 for item in depend:
@@ -407,27 +436,11 @@ for item in depend:
     y -= 1
     x += 1
     for element in item:
-        if item[2] == 's':
-            if y == 11:
-                print "%10s" % (element),
-            else:
-                print '          ',
-                print "%10s" % (element),
-        else:
-            print "%14s" % (element),
+        print "%10s" % (element),
     print
 """
-top = []
-for x in range(1, len(op)):
-    top.append('I#'+str(x))
-top = top*numLoop
-new = zip(top, depend)
-print new
 
-spaces = '        '
-print '          '.join(depend[0])
-
-"""        
+      
 file.close()
 """
 a = 'IF2'
@@ -472,4 +485,15 @@ SD(['SD', '0(R1)', 'R4'], memory, regs)
 DADDI(['DADDI', 'R1', 'R1', '#-8'], memory, regs)
 BNEZ(['BNEZ', 'R1', 'Loop'], memory, regs)
 DADD(['DADD', 'R2', 'R2', 'R4'], memory, regs)
+"""
+"""
+top = []
+for x in range(1, len(op)):
+    top.append('I#'+str(x))
+top = top*numLoop
+new = zip(top, depend)
+print new
+
+spaces = '        '
+print '          '.join(depend[0])
 """
