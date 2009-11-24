@@ -387,40 +387,36 @@ if mode == 3:
     nottaken(IO, depend, numLoop, len_op)
 
 
-"""
+print depend
 x = 1
 while(x < len(depend)):
-    if depend[x-1][2] == 's':
-        depend[x].insert(0, '          '*4)
-    if depend[x-1][2] == 'IF2':
-        depend[x].insert(0, '          ')
+    space = 0
+    if depend[x][6] == 's' and depend[x-1][7] == 's' and \
+       depend[x][4] == 's' and depend[x-1][5] == 's' and \
+       depend[x][2] == 's' and depend[x-1][3] == 's' and \
+       depend[x][1] == 'IF1':
+         depend[x].insert(0, depend[x-1][0])
+    
+    if depend[x-1][1] == 's' or depend[x-1][2] == 's':
+        space = depend[x-1][0].count(' ')
+        count = space//10
+        if space == 0:
+            depend[x].insert(0, '          '*4)
+        else:
+            depend[x].insert(0, '          '*(4+count))
+    if depend[x-1][1] == 'IF2' or depend[x-1][2] == 'IF2':
+        space = depend[x-1][0].count(' ')
+        count = space//10
+        depend[x].insert(0, '          '*(1+count))
 
     x += 1
-"""       
-
+print x       
+print depend
 
 for x in range(1, len(depend)):
-    print "%11s" % ('c#'+str(x)),
+    print "%14s" % ('c#'+str(x)),
 print
 
-a = 'IF2'
-spaces = ""
-print "".join(depend[0])
-## only process through the next to the last sub-list
-## since we print the next sub-list
-for ctr in range(0, len(depend)-1):
-   sub_lst = depend[ctr]
-   w_ctr = 0
-   ##  look at each letter
-   while (sub_lst[w_ctr] != a) and (w_ctr < len(sub_lst)):
-      spaces += "   "
-      w_ctr += 1
-   ##  prints the second through the last sub-list with spaces
-   ##  from this list prepended
-   print spaces + "     ".join(depend[ctr+1])
-
-
-"""
 x = 1
 y = len(depend)-1
 for item in depend:
@@ -438,7 +434,7 @@ for item in depend:
     for element in item:
         print "%10s" % (element),
     print
-"""
+
 
       
 file.close()
