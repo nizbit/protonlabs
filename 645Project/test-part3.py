@@ -391,26 +391,35 @@ print depend
 x = 1
 while(x < len(depend)):
     space = 0
-    if depend[x][6] == 's' and depend[x-1][7] == 's' and \
-       depend[x][4] == 's' and depend[x-1][5] == 's' and \
-       depend[x][2] == 's' and depend[x-1][3] == 's' and \
-       depend[x][1] == 'IF1':
-         depend[x].insert(0, depend[x-1][0])
+    if (depend[x][1] == 'IF1' and depend[x][7] == 's' or \
+       depend[x][0] == 'IF1' and depend[x][6] == 's'):
+        print x, '1',
+        #depend[x].insert(0, depend[x-1][0])
+        test = depend[x-1][0].count(' ')-20 #!!!!  -20 might be wrong
+        count = test//10
+        depend[x].insert(0, '           '*count)
     
-    if depend[x-1][1] == 's' or depend[x-1][2] == 's':
+    if depend[x-1][0] == 'IF1' and depend[x-1][4] == 'IF2' or \
+       depend[x-1][1] == 'IF1' and depend[x-1][5] == 'IF2':
+        print x, '2',
         space = depend[x-1][0].count(' ')
         count = space//10
-        if space == 0:
-            depend[x].insert(0, '          '*4)
-        else:
-            depend[x].insert(0, '          '*(4+count))
-    if depend[x-1][1] == 'IF2' or depend[x-1][2] == 'IF2':
+        if count == 0:
+            print 'test1', count,
+            depend[x].insert(0, '           '*5)
+        if count > 0:
+            print 'test3', count,
+            depend[x].insert(0, '           '*(4+count))
+    if depend[x-1][0] == 'IF1' and depend[x-1][1] == 'IF2' or \
+       depend[x-1][1] == 'IF1' and depend[x-1][2] == 'IF2':
+        print x, '3',
         space = depend[x-1][0].count(' ')
         count = space//10
-        depend[x].insert(0, '          '*(1+count))
+        depend[x].insert(0, '           '*(1+count))
+    #if (depend[x-1][1] == 'IF1' or depend[x-1][2] == 'IF1'
 
     x += 1
-print x       
+       
 print depend
 
 for x in range(1, len(depend)):
