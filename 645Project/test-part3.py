@@ -386,8 +386,6 @@ if mode == 3:
     len_op = len(op)
     nottaken(IO, depend, numLoop, len_op)
 
-
-print depend
 if mode == 1:
     x = 1
     while(x < len(depend)):
@@ -453,8 +451,7 @@ if mode == 3:
         x += 1
             
       
-print depend
-print x
+
 for x in range(1, len(depend)+1):
     if x == 1:
         print "%14s" % ('c#'+str(x)),
