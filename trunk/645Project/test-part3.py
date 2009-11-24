@@ -388,42 +388,59 @@ if mode == 3:
 
 
 print depend
-x = 1
-while(x < len(depend)):
-    space = 0
-    if (depend[x][1] == 'IF1' and depend[x][7] == 's' or \
-       depend[x][0] == 'IF1' and depend[x][6] == 's'):
-        print x, '1',
-        #depend[x].insert(0, depend[x-1][0])
-        test = depend[x-1][0].count(' ')-20 #!!!!  -20 might be wrong
-        count = test//10
-        depend[x].insert(0, '           '*count)
+if mode == 1:
+    x = 1
+    while(x < len(depend)):
+        space = 0
+        if depend[x-1][1] == 'IF1' and depend[x-1][7] == 's':
+            depend[x].insert(0, depend[x-1][0])
+        if depend[x-1][0] == 'IF1' and depend[x-1][1] == 'IF2':
+            depend[x].insert(0, '          ')
+        if depend[x-1][1] == 'IF1' and depend[x-1][5] == 'IF2':
+            temp = depend[x-1][0] + '           '*4
+            depend[x].insert(0, temp)
+    #    if depend[x-1][1] == 'IF1' and depend[x-1][5] == 'IF2':
+    #        print x, '3',
+    #        space = depend[x-1][0].count(' ')
+    #        count = space//10
+    #        if count == 0:
+    #            depend[x].insert(0, '           '*5)
+    #        else:
+    #            print 'HERE',
+    #            depend[x].insert(0, '           '*(4+count))
+        if depend[x-1][1] == 'IF1' and depend[x-1][2] == 'IF2':
+            space = depend[x-1][0].count(' ')
+            count = space//10
+            if count == 0:
+                depend[x].insert(0, '           '*5)
+            else:
+                temp = depend[x-1][0] + '           '
+                depend[x].insert(0, temp)
+            
     
-    if depend[x-1][0] == 'IF1' and depend[x-1][4] == 'IF2' or \
-       depend[x-1][1] == 'IF1' and depend[x-1][5] == 'IF2':
-        print x, '2',
-        space = depend[x-1][0].count(' ')
-        count = space//10
-        if count == 0:
-            print 'test1', count,
-            depend[x].insert(0, '           '*5)
-        if count > 0:
-            print 'test3', count,
-            depend[x].insert(0, '           '*(4+count))
-    if depend[x-1][0] == 'IF1' and depend[x-1][1] == 'IF2' or \
-       depend[x-1][1] == 'IF1' and depend[x-1][2] == 'IF2':
-        print x, '3',
-        space = depend[x-1][0].count(' ')
-        count = space//10
-        depend[x].insert(0, '           '*(1+count))
-    #if (depend[x-1][1] == 'IF1' or depend[x-1][2] == 'IF1'
-
-    x += 1
-       
+        x += 1
+if mode == 2:
+    x = 1
+    while(x < len(depend)):
+        if depend[x-1][0] == 'IF1' and depend[x-1][1] == 'IF2':
+            depend[x].insert(0, '          ')
+        if depend[x-1][1] == 'IF1' and depend[x-1][2] == 'IF2':
+            temp = depend[x-1][0] + '           '
+            depend[x].insert(0, temp)
+        if depend[x-1][1] == 'IF1' and depend[x-1][2] == 's':
+            temp = depend[x-1][0] + '           '
+            depend[x].insert(0, temp)
+        x += 1
+#if mode == 3:
+            
+      
 print depend
-
-for x in range(1, len(depend)):
-    print "%14s" % ('c#'+str(x)),
+print x
+for x in range(1, len(depend)+1):
+    if x == 1:
+        print "%14s" % ('c#'+str(x)),
+    else:
+        print "%10s" % ('c#'+str(x)),
 print
 
 x = 1
