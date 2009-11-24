@@ -429,9 +429,9 @@ if mode == 2:
         if depend[x-1][1] == 'IF1' and depend[x-1][2] == 'IF2':
             temp = depend[x-1][0] + '           '
             depend[x].insert(0, temp)
-        if depend[x-1][1] == 'IF1' and depend[x-1][2] == 's':
-            temp = depend[x-1][0] + '           '
-            depend[x].insert(0, temp)
+        #if depend[x-1][1] == 'IF1' and depend[x-1][2] == 's':
+        #    temp = depend[x-1][0] + '           '
+        #    depend[x].insert(0, temp)
         if depend[x-1][1] == 'IF1' and depend[x-1][2] == 's':
             temp = depend[x-1][0]
             depend[x].insert(0, temp)
