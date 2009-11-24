@@ -393,7 +393,9 @@ if mode == 1:
     while(x < len(depend)):
         space = 0
         if depend[x-1][1] == 'IF1' and depend[x-1][7] == 's':
-            depend[x].insert(0, depend[x-1][0])
+            temp = depend[x-1][0] + '           '*3
+            depend[x].insert(0, temp)
+            #depend[x].insert(0, depend[x-1][0])
         if depend[x-1][0] == 'IF1' and depend[x-1][1] == 'IF2':
             depend[x].insert(0, '          ')
         if depend[x-1][1] == 'IF1' and depend[x-1][5] == 'IF2':
@@ -419,7 +421,7 @@ if mode == 1:
             
     
         x += 1
-if mode == 2:
+if mode == 2 or mode == 3:
     x = 1
     while(x < len(depend)):
         if depend[x-1][0] == 'IF1' and depend[x-1][1] == 'IF2':
@@ -430,8 +432,25 @@ if mode == 2:
         if depend[x-1][1] == 'IF1' and depend[x-1][2] == 's':
             temp = depend[x-1][0] + '           '
             depend[x].insert(0, temp)
+        if depend[x-1][1] == 'IF1' and depend[x-1][2] == 's':
+            temp = depend[x-1][0]
+            depend[x].insert(0, temp)
         x += 1
-#if mode == 3:
+if mode == 3:
+    x = 1
+    while(x < len(depend)):
+        if depend[x-1][0] == 'IF1' and depend[x-1][1] == 'IF2':
+            depend[x].insert(0, '          ')
+        if depend[x-1][1] == 'IF1' and depend[x-1][2] == 'IF2':
+            temp = depend[x-1][0] + '           '
+            depend[x].insert(0, temp)
+        if depend[x-1][1] == 'IF1' and depend[x-1][2] == 's':
+            temp = depend[x-1][0] + '           '
+            depend[x].insert(0, temp)
+        if depend[x-1][1] == 'IF1' and depend[x-1][2] == 's':
+            temp = depend[x-1][0]
+            depend[x].insert(0, temp)
+        x += 1
             
       
 print depend
