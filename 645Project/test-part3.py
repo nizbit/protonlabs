@@ -290,8 +290,6 @@ def nottaken(ops, instructions, numloop, len_op):
         
         if ops[x][0] == 'BNEZ' and numloop != 0:
             #print 'ops', ops[x]
-            print x
-            print len_op - x
             if len_op - (x+1) == 3:
                 currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
                 instructions.append(currenti)
@@ -449,10 +447,12 @@ if mode == 3:
             temp = depend[x-1][0]
             depend[x].insert(0, temp)
         x += 1
-            
-      
 
-for x in range(1, len(depend)+1):
+test = depend[len(depend)-1][0]
+num = test.split('           ')
+cc = len(num)+7
+
+for x in range(1, cc+1):
     if x == 1:
         print "%14s" % ('c#'+str(x)),
     else:
