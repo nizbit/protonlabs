@@ -1,4 +1,13 @@
+"""
+    Doug Van Allen
+    KUID 2326583
+    11/24/2009
+    645 Programming project
+"""
+
+
 import tkFileDialog
+import tkSimpleDialog
 
 def extract(text, sub1, sub2):
     """
@@ -21,124 +30,326 @@ def storeInDict(text, dict):
         temp.append(words)
     return temp
 
-def checkDepend(loopCount, op, instructions):
-    temp = []
-    check = ['0', '0']
-    while loopCount != 0:
+def LD(item, memory, regs):
+    loop = 'loop:'
+    for i in item:
+        if i == 'LD':
+            if item[0].lower() == loop:
+                dest = item[2]
+                source = item[3]
+            else:
+                dest = item[1]
+                source = item[2]
+            result = source.translate(None, ')').split('(')
+            loc = int(result[0]) + regs[result[1]]
+            memValue = memory[str(loc)]
+            #memValue = memory[str(0)]
+            if dest == 'R0':
+                regs[dest] = 0
+            else:
+                regs[dest] = memValue   
+
+def DADD(item, memory, regs):
+    loop = 'loop:'
+    for i in item:
+        if i == 'DADD':
+            if item[0].lower() == loop:
+                dest = item[2]
+                source1 = regs[item[3]]
+                source2 = regs[item[4]]
+            else:
+                dest = item[1]
+                source1 = regs[item[2]]
+                source2 = regs[item[3]]
+            #print source1, source2
+            answer = source1 + source2
+            #print answer
+            if dest == 'R0':
+                regs[dest] = 0
+            else:
+                regs[dest] = answer
+            
+def DADDI(item, memory, regs):
+    loop = 'loop:'
+    for i in item:
+        if i == 'DADDI':
+            if item[0].lower() == loop:
+                dest = item[2]
+                source1 = regs[item[3]]
+                source2 = item[4]
+            else:
+                dest = item[1]
+                source1 = regs[item[2]]
+                source2 = item[3]
+            source2 = source2.translate(None, '#')
+            answer = source1 + int(source2)
+            #print answer
+            if dest == 'R0':
+                regs[dest] = 0
+            else:
+                regs[dest] = answer
+
+def SD(item, memory, regs):            
+    loop = 'loop:'
+    for i in item:    
+        if i == 'SD':
+            if item[0].lower() == loop:
+                temp = item[2]
+                addr = temp.translate(None, ')').split('(')
+                dest = int(addr[0]) + regs[addr[1]]
+                source = regs[item[3]]
+                memory[dest] = source
+            
+            else:
+                temp = item[1]
+                addr = temp.translate(None, ')').split('(')
+                dest = int(addr[0]) + regs[addr[1]]
+                source = regs[item[2]]
+                memory[dest] = source
+
+def BNEZ(item, memory, regs):                
+    for i in item:
+        if i == "BNEZ":
+            cmp = regs[item[1]]
+            if cmp == 0:
+                return False
+            else:
+                return True
+
+def unroll(op, memory, regs):
+    IO = []
+    pc = 0
+    spot = 0
+    loop = 'loop:'
+    index = 1
+    numLoop = 0
+    func = {'LD':LD, 'SD':SD, 'DADD':DADD, 'DADDI':DADDI, 'BNEZ':BNEZ}
+    while index < (len(op)):
         for item in op:
-            if item[0] == "Loop:":
-                temp = item[1:]
-                length = len(item) - 1
-            else:
-                temp = list(item)
-                length = len(item)
+            if item[0] == 'LD':
+                if index > (len(op)):
+                    break
+                IO.append(op[index-1])
+                LD(item, memory, regs)
+                pc += 1
+            if item[0] == 'SD':
+                if index > (len(op)):
+                    break
+                IO.append(op[index-1])
+                SD(item, memory, regs)
+                pc += 1
+            if item[0].lower() == loop:
+                if index > (len(op)):
+                    break
+                IO.append(op[index-1])
+                varstring = item[1]
+                func[varstring](item, memory, regs)
+                spot = pc
+                pc += 1
+            if item[0] == 'DADD':
+                if index > (len(op)):
+                    break
+                IO.append(op[index-1])
+                DADD(item, memory, regs)
+                pc += 1
+            if item[0] == 'DADDI':
+                if index > (len(op)):
+                    break
+                IO.append(op[index-1])
+                DADDI(item, memory, regs)
+                pc += 1
+            if item[0] == 'BNEZ':
+                if index > (len(op)):
+                    break
+                IO.append(op[index-1])
+                numLoop += 1
+                temp = BNEZ(item, memory, regs)
+                if temp == False:
+                    """
+                        last change is below-
+                        delete pass and remove comment to revert
+                    """
+                    #index = pc
+                    pass
+                                
+                if temp == True:
+                    pc = spot
+                    index = pc
+            
+            index += 1
+    return (numLoop, IO)
+
+def flush(ops, instructions):
+    loop = 'loop:'
+    x = 1
+    
+    for item in ops:
+        for element in item:
+            if element.lower() == loop:
+                del item[0]
+    #print 'ops', ops
+    while(x < len(ops)):
+        #print 'ops', ops[x]
         
-            if check[1] == item[length-2] or check[1] == item[length - 1]:
-                if item[0] == 'BNEZ':
-                    currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
-                    instructions.append(currenti)
-                    if loopCount != 1:
-                        currenti = ['IF1', 's', 's', 's', 's', 's', 's', 's', 's', 's']
-                        instructions.append(currenti)
-                else:
-                    currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
-                    instructions.append(currenti)
-        #    elif item[0] == 'BNEZ':
-        #         currenti = ['IF1', 's', 's', 's', 's', 's', 's', 's', 's', 's']
-        #         instructions.append(currenti)
-            else:
+        if x-1 == 0:
+            #print 'ops', ops[x]
+            currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+            instructions.append(currenti)
+            
+        #print 'x', x
+        
+        if len(ops[x]) == 3:
+            if ops[x][0] == 'SD' and ops[x][2] == ops[x-1][1]:
+                #print 'ops', ops[x]
+                currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+            if ops[x][0] == 'BNEZ' and ops[x][1] == ops[x-1][1]:
+                #print 'ops', ops[x]
+                currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+                currenti = ['IF1', 's', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+            if ops[x][0] == 'BNEZ' and ops[x][1] != ops[x-1][1]:
+                #print 'ops', ops[x]
                 currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
                 instructions.append(currenti)
-    
-            check = temp[:]
-        loopCount -= 1
+                currenti = ['IF1', 's', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+            if ops[x][0] != 'BNEZ' and ops[x][2] != ops[x-1][1]:
+                #print 'ops', ops[x]
+                currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+                
+        if len(ops[x]) == 4:
+            #if ops[x][0].lower() == loop:
+                
+            if ops[x][2] == ops[x-1][1] or ops[x][3] == ops[x-1][1]:
+                #print 'ops', ops[x]
+                currenti = ['IF1', 's', 's', 's', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+            else:
+                #print 'ops', ops[x]
+                currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)    
 
-def process(op, memory, regs, loopCount):
-    go = True
-    loopCount = 0
-    while go == True:
-        for item in op:
-            for i in item:
-                if i == 'Loop:':
-                    continue
-                """
-                Need to add checking if R0 is trying to be written(stored) to
-                """
-                if i == 'LD':
-                    if item[0] == "Loop:":
-                        dest = item[2]
-                        source = item[3]
-                    else:
-                        dest = item[1]
-                        source = item[2]
-                    result = source.translate(None, ')').split('(')
-                    loc = int(result[0]) + regs[result[1]]
-                    memValue = memory[str(loc)]
-                    #memValue = memory[str(0)]
-                    regs[dest] = memValue    
+        x += 1
+
+def taken(ops, instructions, numloop):
+    loop = 'loop:'
+    x = 1
+    
+    for item in ops:
+        for element in item:
+            if element.lower() == loop:
+                del item[0]
+    #print 'ops', ops
+    while(x < len(ops)):
+        #print 'ops', ops[x]
         
-                if i == 'DADD':
-                    if item[0] == "Loop:":
-                        dest = item[2]
-                        source1 = regs[item[3]]
-                        source2 = regs[item[4]]
-                    else:
-                        dest = item[1]
-                        source1 = regs[item[2]]
-                        source2 = regs[item[3]]
-                    #print source1, source2
-                    answer = source1 + source2
-                    #print answer
-                    regs[dest] = answer
-                    
-                if i == 'DADDI':
-                    if item[0] == "Loop:":
-                        dest = item[2]
-                        source1 = regs[item[3]]
-                        source2 = item[4]
-                    else:
-                        dest = item[1]
-                        source1 = regs[item[2]]
-                        source2 = item[3]
-#                    dest = item[1]
-#                    source1 = regs[item[2]]
-#                    source2 = item[3]
-                    source2 = source2.translate(None, '#')
-                    answer = source1 + int(source2)
-                    #print answer
-                    regs[dest] = answer
-                    
-                if i == 'SD':
-                    if item[0] == "Loop:":
-                        temp = item[2]
-                        addr = temp.translate(None, ')').split('(')
-                        dest = int(addr[0]) + regs[addr[1]]
-                        source = regs[item[3]]
-                        memory[dest] = source
-                    
-                    else:
-                        temp = item[1]
-                        addr = temp.translate(None, ')').split('(')
-                        dest = int(addr[0]) + regs[addr[1]]
-                        source = regs[item[2]]
-                        memory[dest] = source
-                    
-                if i == "BNEZ":
-                    loopCount += 1
-                    cmp = regs[item[1]]
-                    #print cmp
-                    if cmp <= 0:
-                        go = False
-                        #loopCount += 1
-                        #break
-                    else:
-                        go = True
-                        #loopCount += 1   
-    return loopCount
+        if x-1 == 0:
+            #print 'ops', ops[x]
+            currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+            instructions.append(currenti)
+            
+        #print 'x', x
+        if ops[x][0] != 'BNEZ':
+            #print 'ops', ops[x]
+            currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+            instructions.append(currenti)
+        
+        if ops[x][0] == 'BNEZ' and numloop != 0:
+            #print 'ops', ops[x]
+            currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+            instructions.append(currenti)
+            currenti = ['IF1', 's', 's', 's', 's', 's', 's']
+            instructions.append(currenti)
+            numloop -= 1
+
+        if numloop == 0 and ops[x][0] == 'BNEZ':
+            currenti = ['IF1', 'IF2', 's', 's', 's', 's']
+            instructions.append(currenti)
+            currenti = ['IF1', 'IF2']
+            instructions.append(currenti)
+
+        x += 1
+
+def nottaken(ops, instructions, numloop, len_op):
+    loop = 'loop:'
+    x = 1
+    
+    for item in ops:
+        for element in item:
+            if element.lower() == loop:
+                del item[0]
+    #print 'ops', ops
+    while(x < len(ops)):
+        #print 'ops', ops[x]
+        
+        if x-1 == 0:
+            #print 'ops', ops[x]
+            currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+            instructions.append(currenti)
+            
+        #print 'x', x
+        if ops[x][0] != 'BNEZ':
+            #print 'ops', ops[x]
+            currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+            instructions.append(currenti)
+        
+        if ops[x][0] == 'BNEZ' and numloop != 0:
+            #print 'ops', ops[x]
+            if len_op - (x+1) == 3:
+                currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+                currenti = ['IF1', 'IF2', 'ID', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['IF1', 'IF2', 's', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['IF1', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+            if len_op - (x+1) == 2:
+                currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+                currenti = ['IF1', 'IF2', 'ID', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['IF1', 'IF2', 's', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['s', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+            if len_op - (x+1) == 1:
+                currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+                currenti = ['IF1', 'IF2', 'ID', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['s', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['s', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+            if len_op - (x+1) == 0:
+                currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+                instructions.append(currenti)
+                currenti = ['s', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['s', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+                currenti = ['s', 's', 's', 's', 's', 's']
+                instructions.append(currenti)
+            
+            numloop -= 1
+
+        if numloop == 0 and ops[x][0] == 'BNEZ':
+             currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+             instructions.append(currenti)
+             #currenti = ['IF1', 'IF2', 'ID', 'EX', 'MEM1', 'MEM2', 'WB']
+             #instructions.append(currenti)
+
+
+        x += 1
 
 file = tkFileDialog.askopenfile(title="Open input data file",
                                 mode='r',
                                 filetypes=[("all formats", "*")])
+
 regs = {}
 for x in range(32):
     key = 'R' + str(x)
@@ -163,145 +374,119 @@ for element in code:
     word = newline.split()
     op.append(word)
 
-loopCount = 0
-loopCount = process(op, memory, regs, loopCount)
-print 'loopCount',loopCount
 
-afterBNEZ = []
-beforeBNEZ = []
-check = ['0', '0']
-instructions = []
-#place while loop here(old-now in function checkDepend)
-loopPlace = []
-bnezPlace = []
-numLoop = 0
+unroll = unroll(op, memory, regs)
+numLoop = unroll[0]
+IO = unroll[1]
 
-for item in op:
-    numLoop += 1
-    if item[0] == 'Loop:':
-        loopPlace.append(numLoop)
-        #numLoop += 1
-        #print loopPlace
-    if item[0] == 'BNEZ':
-        bnezPlace.append(numLoop)
-        place = op.index(item)
-        #print place
-        afterBNEZ = op[place+1:]
-        beforeBNEZ = op[0:place+1]
-"""
-The check for 2 nested loops goes here
-"""        
-        
-print 'numLoop', numLoop
-print loopPlace
-print bnezPlace
-print afterBNEZ
-print beforeBNEZ
-#print op        
-checkDepend(loopCount, beforeBNEZ, instructions)
-checkDepend(1, afterBNEZ, instructions)
+mode = tkSimpleDialog.askinteger(' Choose a mode ',\
+    'Please choose a mode:''\n''1 - Flushing''\n''2 - Predict taken''\n''3 - Predict not taken''\n'\
+    ,minvalue=1, maxvalue=3)
 
-#print instructions
-#print len(instructions)
-#print temp
-#print regs
-#print loopCount    
-file.close()
-"""
-go = True
-loopCount = 0
-while go == True:
-    for item in op:
-        for i in item:
-            if i == 'Loop:':
-                continue
-           
-           # Need to add checking if R0 is trying to be written(stored) to
+depend = []
+if mode == 1:
+    flush(IO, depend)
+if mode == 2:
+    taken(IO, depend, numLoop)
+if mode == 3:
+    len_op = len(op)
+    nottaken(IO, depend, numLoop, len_op)
+
+if mode == 1:
+    x = 1
+    while(x < len(depend)):
+        space = 0
+        if depend[x-1][1] == 'IF1' and depend[x-1][7] == 's':
+            temp = depend[x-1][0] + '          '*3
+            depend[x].insert(0, temp)
+            #depend[x].insert(0, depend[x-1][0])
+        if depend[x-1][0] == 'IF1' and depend[x-1][1] == 'IF2':
+            depend[x].insert(0, '          ')
+        if depend[x-1][1] == 'IF1' and depend[x-1][5] == 'IF2':
+            temp = depend[x-1][0] + '          '*4
+            depend[x].insert(0, temp)
+    #    if depend[x-1][1] == 'IF1' and depend[x-1][5] == 'IF2':
+    #        print x, '3',
+    #        space = depend[x-1][0].count(' ')
+    #        count = space//10
+    #        if count == 0:
+    #            depend[x].insert(0, '           '*5)
+    #        else:
+    #            print 'HERE',
+    #            depend[x].insert(0, '           '*(4+count))
+        if depend[x-1][1] == 'IF1' and depend[x-1][2] == 'IF2':
+            space = depend[x-1][0].count(' ')
+            count = space//10
+            if count == 0:
+                depend[x].insert(0, '          '*5)
+            else:
+                temp = depend[x-1][0] + '          '
+                depend[x].insert(0, temp)
             
-            if i == 'LD':
-                dest = item[2]
-                source = item[3]
-                result = source.translate(None, ')').split('(')
-                loc = int(result[0]) + regs[result[1]]
-                memValue = memory[str(loc)]
-                #memValue = memory[str(0)]
-                regs[dest] = memValue    
     
-            if i == 'DADD':
-                dest = item[1]
-                source1 = regs[item[2]]
-                source2 = regs[item[3]]
-                #print source1, source2
-                answer = source1 + source2
-                #print answer
-                regs[dest] = answer
-                
-            if i == 'DADDI':
-                dest = item[1]
-                source1 = regs[item[2]]
-                source2 = item[3]
-                source2 = source2.translate(None, '#')
-                answer = source1 + int(source2)
-                #print answer
-                regs[dest] = answer
-                
-            if i == 'SD':
-                temp = item[1]
-                addr = temp.translate(None, ')').split('(')
-                dest = int(addr[0]) + regs[addr[1]]
-                source = regs[item[2]]
-                memory[dest] = source
-                
-            if i == "BNEZ":
-                loopCount += 1
-                cmp = regs[item[1]]
-                #print cmp
-                if cmp <= 0:
-                    go = False
-                    #loopCount += 1
-                    #break
-                else:
-                    go = True
-                    #loopCount += 1   
-"""
-"""
-for element in op:
-    for item in element:
-        for piece in item:
-            if piece == ',':
-                temp = piece.replace(',', '')
-"""
-"""            else:
-                if i == 'LD':
-                    dest = item[2]
-                    source = item[3]
-                    result = source.translate(None, ')').split('(')
-                    loc = int(result[0]) + regs[result[1]]
-                    memValue = memory[str(loc)]
-                    regs[dest] = memValue
-                if i == 'DADD':
-                    print "dadd"
-                    dest = item[1]
-                    source1 = regs[item[2]]
-                    source2 = regs[item[3]]
-                    #print source1, source2
-                    answer = source1 + source2
-                    #print answer
-                    regs[dest] = answer
-                if i == 'DADDI':
-                    print "daddi"
-                    dest = item[1]
-                    source1 = regs[item[2]]
-                    source2 = item[3]
-                    source2 = source2.translate(None, '#')
-                    answer = source1 + int(source2)
-                    #print answer
-                    regs[dest] = answer
-                if i == 'SD':
-                    print "sd"
-                    temp = item[1]
-                    addr = temp.translate(None, ')').split('(')
-                    dest = int(addr[0]) + regs[addr[1]]
-                    source = regs[item[2]]
-                    memory[dest] = source
-"""
+        x += 1
+if mode == 2:
+    x = 1
+    while(x < len(depend)):
+        if depend[x-1][0] == 'IF1' and depend[x-1][1] == 'IF2':
+            depend[x].insert(0, '         ')
+        if depend[x-1][1] == 'IF1' and depend[x-1][2] == 'IF2':
+            temp = depend[x-1][0] + '          '
+            depend[x].insert(0, temp)
+        #if depend[x-1][1] == 'IF1' and depend[x-1][2] == 's':
+        #    temp = depend[x-1][0] + '           '
+        #    depend[x].insert(0, temp)
+        if depend[x-1][1] == 'IF1' and depend[x-1][2] == 's':
+            temp = depend[x-1][0]
+            depend[x].insert(0, temp)
+        x += 1
+if mode == 3:
+    x = 1
+    while(x < len(depend)):
+        if depend[x-1][0] == 'IF1' and depend[x-1][1] == 'IF2':
+            depend[x].insert(0, '         ')
+        if depend[x-1][1] == 'IF1' and depend[x-1][2] == 'IF2':
+            temp = depend[x-1][0]+ '          '
+            depend[x].insert(0, temp) 
+        #if depend[x-1][1] == 'IF1' and depend[x-1][2] == 's':
+        #    temp = depend[x-1][0] + '           '
+        #    depend[x].insert(0, temp)
+        if depend[x-1][1] == 's' and depend[x-1][2] == 's':
+            temp = depend[x-1][0]
+            depend[x].insert(0, temp)
+        x += 1
+
+test = depend[len(depend)-1][0]
+num = test.split('          ')
+cc = len(num)+7
+
+outfile = tkFileDialog.asksaveasfile(title="Save output data file")
+
+for x in range(1, cc+1):
+    if x == 1:
+        outfile.write("%14s" % ('c#'+str(x)),)
+    else:
+        outfile.write("%10s" % ('c#'+str(x)),)
+outfile.write('\n')
+
+x = 1
+y = len(depend)-1
+for item in depend:
+    if x <= len(op):
+        outfile.write('I#'+str(x),)
+    else:
+        if y == 0:
+            x = len(op)
+            outfile.write('I#'+str(x),)
+        else:
+            x = 1
+            outfile.write('I#'+str(x),)
+    y -= 1
+    x += 1
+    for element in item:
+        outfile.write("%10s" % (element),)
+    outfile.write('\n')
+
+
+      
+file.close()
