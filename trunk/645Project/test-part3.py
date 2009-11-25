@@ -1,3 +1,11 @@
+"""
+    Doug Van Allen
+    KUID 2326583
+    11/24/2009
+    645 Programming project
+"""
+
+
 import tkFileDialog
 import tkSimpleDialog
 
@@ -389,13 +397,13 @@ if mode == 1:
     while(x < len(depend)):
         space = 0
         if depend[x-1][1] == 'IF1' and depend[x-1][7] == 's':
-            temp = depend[x-1][0] + '           '*3
+            temp = depend[x-1][0] + '          '*3
             depend[x].insert(0, temp)
             #depend[x].insert(0, depend[x-1][0])
         if depend[x-1][0] == 'IF1' and depend[x-1][1] == 'IF2':
             depend[x].insert(0, '          ')
         if depend[x-1][1] == 'IF1' and depend[x-1][5] == 'IF2':
-            temp = depend[x-1][0] + '           '*4
+            temp = depend[x-1][0] + '          '*4
             depend[x].insert(0, temp)
     #    if depend[x-1][1] == 'IF1' and depend[x-1][5] == 'IF2':
     #        print x, '3',
@@ -410,9 +418,9 @@ if mode == 1:
             space = depend[x-1][0].count(' ')
             count = space//10
             if count == 0:
-                depend[x].insert(0, '           '*5)
+                depend[x].insert(0, '          '*5)
             else:
-                temp = depend[x-1][0] + '           '
+                temp = depend[x-1][0] + '          '
                 depend[x].insert(0, temp)
             
     
@@ -421,9 +429,9 @@ if mode == 2:
     x = 1
     while(x < len(depend)):
         if depend[x-1][0] == 'IF1' and depend[x-1][1] == 'IF2':
-            depend[x].insert(0, '          ')
+            depend[x].insert(0, '         ')
         if depend[x-1][1] == 'IF1' and depend[x-1][2] == 'IF2':
-            temp = depend[x-1][0] + '           '
+            temp = depend[x-1][0] + '          '
             depend[x].insert(0, temp)
         #if depend[x-1][1] == 'IF1' and depend[x-1][2] == 's':
         #    temp = depend[x-1][0] + '           '
@@ -436,9 +444,9 @@ if mode == 3:
     x = 1
     while(x < len(depend)):
         if depend[x-1][0] == 'IF1' and depend[x-1][1] == 'IF2':
-            depend[x].insert(0, '          ')
+            depend[x].insert(0, '         ')
         if depend[x-1][1] == 'IF1' and depend[x-1][2] == 'IF2':
-            temp = depend[x-1][0]+ '           '
+            temp = depend[x-1][0]+ '          '
             depend[x].insert(0, temp) 
         #if depend[x-1][1] == 'IF1' and depend[x-1][2] == 's':
         #    temp = depend[x-1][0] + '           '
@@ -449,89 +457,36 @@ if mode == 3:
         x += 1
 
 test = depend[len(depend)-1][0]
-num = test.split('           ')
+num = test.split('          ')
 cc = len(num)+7
+
+outfile = tkFileDialog.asksaveasfile(title="Save output data file")
 
 for x in range(1, cc+1):
     if x == 1:
-        print "%14s" % ('c#'+str(x)),
+        outfile.write("%14s" % ('c#'+str(x)),)
     else:
-        print "%10s" % ('c#'+str(x)),
-print
+        outfile.write("%10s" % ('c#'+str(x)),)
+outfile.write('\n')
 
 x = 1
 y = len(depend)-1
 for item in depend:
     if x <= len(op):
-        print 'I#'+str(x),
+        outfile.write('I#'+str(x),)
     else:
         if y == 0:
             x = len(op)
-            print 'I#'+str(x),
+            outfile.write('I#'+str(x),)
         else:
             x = 1
-            print 'I#'+str(x),
+            outfile.write('I#'+str(x),)
     y -= 1
     x += 1
     for element in item:
-        print "%10s" % (element),
-    print
+        outfile.write("%10s" % (element),)
+    outfile.write('\n')
 
 
       
 file.close()
-"""
-a = 'IF2'
-spaces = ""
-print "     ".join(depend[0])
-## only process through the next to the last sub-list
-## since we print the next sub-list
-for ctr in range(0, len(depend)-1):
-   sub_lst = depend[ctr]
-   w_ctr = 0
-   ##  look at each letter
-   print 'len(sub_lst)', len(sub_lst)
-   print 'w_ctr', w_ctr
-   while (sub_lst[w_ctr] != a) and (w_ctr < len(sub_lst)):
-      spaces += "   "
-      w_ctr += 1
-   ##  prints the second through the last sub-list with spaces
-   ##  from this list prepended
-   print spaces + "     ".join(depend[ctr+1])
-"""
-#prev = depend[0]
-#for item in depend:
-"""
-top = []
-  
-for x in range(1, len(op)):
-    top.append('I#'+str(x))
-top = top*numLoop
-print top
-"""
-"""
-x=0
-while x < 3:
-    for op[x] in op:
-        print op[x][0]
-        x += 1
-"""
-"""
-LD(['LD', 'R2', '0(R1)'], memory, regs)
-DADD(['DADD', 'R4', 'R2', 'R3'], memory, regs)
-SD(['SD', '0(R1)', 'R4'], memory, regs)
-DADDI(['DADDI', 'R1', 'R1', '#-8'], memory, regs)
-BNEZ(['BNEZ', 'R1', 'Loop'], memory, regs)
-DADD(['DADD', 'R2', 'R2', 'R4'], memory, regs)
-"""
-"""
-top = []
-for x in range(1, len(op)):
-    top.append('I#'+str(x))
-top = top*numLoop
-new = zip(top, depend)
-print new
-
-spaces = '        '
-print '          '.join(depend[0])
-"""
